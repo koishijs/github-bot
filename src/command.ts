@@ -88,7 +88,7 @@ export default function command(ctx: Context, github: GitHub) {
               return session.text('.add-failed', [name])
             }
           }
-          await ctx.database.create('github', { name, id: data.id, secret })
+          await ctx.database.create('github', { name, id: data.data.id, secret })
           if (!options.subscribe) return session.text('.add-succeeded', [name])
           return session.execute({
             name: 'github',
@@ -264,8 +264,8 @@ export default function command(ctx: Context, github: GitHub) {
     // 202：服务器已接受请求，但尚未处理
     // 在 github.repos -a 时确保获得一个 2xx 的状态码
     if (!data) return _ctx.status = 202
-    if (signature !== `sha256=${createHmac('sha256', data.secret).update(_ctx.request.rawBody).digest('hex')}`) {
-      return _ctx.status = 403
+    if (signature !== `sha256=${createHmac('sha256', data.secret).update((_ctx.request as any).rawBody).digest('hex')}`) {
+     return _ctx.status = 403
     }
     const fullName = payload.repository.full_name.toLowerCase()
 
